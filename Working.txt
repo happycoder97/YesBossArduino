@@ -1,0 +1,71 @@
+
+Arduino Part Working Mechanism
+------------------------------
+The device is turned on, wait for 5 second
+Initialize SMS library
+Then execute the following in an infinite loop
+    if there's a new SMS
+        try parsing it with Parser
+        if he succeed, extract password and match it
+        with auth-helper
+        if that succeed, figure out what kind of message it is
+        if it's a status request message:
+            Populate parser variables and generate an sms
+            give it to sms library
+        if it's a status update message:
+            Set hardware values from parsed values
+            send back the new status just like we did with status request
+        if it's a change phone no message
+            simply update the phone number
+            send new status to new number
+        if it's a change password message
+            simply update the password
+            send new status back
+
+
+Security Mechanism
+------------------
+The device needs a password to authenticate
+If the password is forgotten, a button inside the device will reset
+it to a default value.
+
+Parser
+------
+
+Recieve General Format:
+
+-----------------
+|$PASSWD CMD\n  |
+|CMD BODY       |
+-----------------
+
+Send back General Format:
+(after executing change ph.no/passwd)
+
+-----------------
+|$STATUS_CODE   |
+|Human readable |
+|description    |
+-----------------
+
+New status msg send to phone:
+
+---------------------
+|$STATUS_CODE DESC\n|
+|ON Dev no.s\n      |
+|OFF Dev no.s\n     |
+|TEMP Temp_in_C C\n |
+|WATERLVL Prcnt%\n  |
+--------------------
+Estimated Chars:
+    1+3+1 =           5
+    2+3+2(sp)+16+1 = 22
+    5+2+3          = 10
+    13             = 13
+    Total          = 50
+    Remaining chars for
+STATUS_CODE: (possible values)
+    Status Updated
+
+
+

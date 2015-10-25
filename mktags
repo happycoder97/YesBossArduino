@@ -1,0 +1,7 @@
+#!/bin/bash
+ctags -f tags.cpp `find . -path ./Downloads -prune -o \( -name "*.cpp" -o -name "*.h" \) -print`
+#ctags -f tags.pde --langmap=c++:.pde `find . -name "*.pde"`
+ctags -f tags.ino --langmap=c++:.ino `find . -path ./Downloads -prune -o -name "*.ino" -print`
+cat tags.ino tags.cpp > tags
+LC_COLLATE=C sort tags -o tags
+rm -f tags.*
