@@ -4,6 +4,7 @@
 void DataParser::parseRequest(char message[160], Request_Message& request_message) {
   #define bufferlen 10
   char buffer[bufferlen];
+
   byte messageCharIndex = 0;
   messageCharIndex=getNextWord(message,messageCharIndex,buffer,bufferlen);
 

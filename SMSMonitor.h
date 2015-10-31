@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <
+#include "SerialGSM.h"
 
 class SMSMonitor {
 
@@ -11,7 +11,7 @@ class SMSMonitor {
         /*
          * Get next sms
          */
-        char[160] nextSMS();
+        bool nextSMS(char msg[160]);
         /*
          * Creates an instanc of SMSMonitor
          * and instantiate the SerialGSM interface
@@ -21,10 +21,10 @@ class SMSMonitor {
         SMSMonitor(byte rx_pin,byte tx_pin);
 
     private:
-        //Deleted for saving memory
-        //byte rx_pin;
-        //byte tx_pin;
+        
         SerialGSM serial_gsm;
+        SerialGSM::SMS sms_buffer;
+        bool buffer_not_empty;
 
 };
 

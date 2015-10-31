@@ -1,7 +1,13 @@
 #include<Arduino.h>
+#include "DHT11.h"
 
 class TempSensor {
-    public:
-        byte getTemp();
+  public:
+    TempSensor(byte dht11_pin);
+    byte getTemp();
+  private:
+    DHT11 dht11;
+    byte dht11_pin;
+
 };
 

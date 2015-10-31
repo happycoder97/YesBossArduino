@@ -4,40 +4,36 @@
 #include <SoftwareSerial.h>
 
 #define SERIALTIMEOUT 2000
-#define PHONESIZE 13
 #define MAXMSGLEN 160
+#define BUFFERLEN 50
 
 class SerialGSM : public SoftwareSerial {
 public:
+  struct SMS {
+    char* phone_no;
+    char* message;
+    byte max_message_len;
+    byte max_phone_no_len;
+  };
+    
   SerialGSM(int rxpin,int txpin);
-  void FwdSMS2Serial();
-  void SendSMS();
-  void SendSMS(char * cellnumber,char * outmsg);
-  void DeleteAllSMS();
-  void Reset();
-  void EndSMS();
-  void StartSMS();
-  int ReadLine();
-  int ReceiveSMS();
-  void Verbose(boolean var1);
-  boolean Verbose();
-  void Sender(char * var1);
-  char * Sender();
-  void Rcpt(char * var1);
-  char * Rcpt();
-  void Message(char * var1);
-  char * Message();
-  void Boot();
-
-  boolean verbose;
-  char sendernumber[PHONESIZE + 1];
-  char rcpt[PHONESIZE + 1];
-  char outmessage[160];
-  char inmessage[160];
+  /* returns:
+   * 0 if succeed
+   * 1 if length of the message>MAXMSGLEN
+   * 2 for some other errors
+   */
+  byte sendSMS(SMS& sms);
+  void deleteAllSMS();
+  void reset();
+  int receiveSMS(SMS& sms);
+  void boot();
 
 protected:
   unsigned long lastrec;
-
+  void fwdSMS2Serial();
+  char buffer[BUFFERLEN];
+  int response;
+  int readline(char* buffer,int bufferlen);
 };
 
 #endif /* not defined _SerialGSM_H */

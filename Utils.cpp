@@ -1,6 +1,6 @@
 #include "Utils.h"
 
-void strcpy(char* dest, int destbegin,  char* source,int sourcebegin, int length) {
+void strcpy(char* dest, int destbegin,  const char* source,int sourcebegin, int length) {
     int i=0;
     while(source[i+sourcebegin]!='\0'&&(length!=-1||i<length)) {
         if(length!=-1&&i>=length) return;
@@ -74,7 +74,7 @@ int getNextWord(char* stringToSplit,int start,char* buffer,int bufferlen) {
     return i;
 }
 /* str1 == str2 */
-bool streq(char* s1,char* s2,int s1begin,int s2begin) {
+bool streq(const char* s1,const char* s2,int s1begin,int s2begin) {
     int i = 0;
     while(s1[i+s1begin]==s2[i+s2begin]) {
         if(s1[i+s1begin]=='\0') return true;
@@ -96,3 +96,12 @@ int itoa(int i, char* s,int offset,int slen) {
   return offset+j;
 }
 
+/*
+ * return the length of the string
+ * EXCLUDING null character
+ */
+int strlen(char* s) {
+  int len=0;
+  while(s[len]!='\0') len++;
+  return len;
+}

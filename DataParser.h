@@ -1,4 +1,5 @@
 #include<Arduino.h>
+#include "GlobalOptions.h"
 
 #define MAGIC_CHAR '$'
 
@@ -19,7 +20,8 @@
  *  2) Data to message
  *
  *  Currently the parser can accept an instance of
- *  Status_Message_To
+ *  Status_Message_To_Phone and populate a given
+ *  char array[160];
  */
 
 /*
@@ -34,7 +36,13 @@
 #define REQ_UPDATE_STATUS 1
 #define REQ_CHANGE_PASSWORD 2
 #define REQ_CHANGE_PHONE 3
-
+/*
+ * these are tokens that are to
+ * be sent by user inorder to let 
+ * the mcu indentify what type of request is this
+ * it is translated to corresponding REQ_XXX codes
+ * by the parser
+ */
 #define REQ_STATUS_TOKEN "STATUS"
 #define REQ_UPDATE_STATUS_TOKEN "UPDATE"
 #define REQ_CHANGE_PASSWORD_TOKEN "CPW"
