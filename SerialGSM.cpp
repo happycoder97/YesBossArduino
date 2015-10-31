@@ -213,43 +213,81 @@ void SerialGSM::boot(){
   #endif
   fwdSMS2Serial();
 }
-
-void charToGSM7(char in, char& gsm7) {
+/*
+ * store the GSM7 representation of 'in'
+ * in 'gsm7'
+ * In our case, only '$' matters
+ */
+void char_to_GSM7(char in, char& gsm7) {
   /* every char we use, except the '$'
    * has same representation in ASCII and GSM7 */
   if(in=='$') gsm7=2;
   else gsm7=in;
 }
 
-void decToHexChar2(byte dec,unsigned char *c,int startIndex) {
+/*
+ * store the hexadecimal representation of decimal in char *c
+ * c must be at least of length startIndex+3
+ */
+void byte2hex_2char(byte dec,unsigned char *c,int startIndex) {
   char hexTable[17] = "0123456789ABCDEF";
   c[startIndex+0]=hexTable[dec/16];
   c[startIndex+1]=hexTable[dec%16];
   c[startIndex+2]='\0';
 }
-
-void msgToPdu(unsigned char in[],unsigned char out[]) {
-  int i = 0;
+/*
+ * convert ascii sms message content
+ * to pdu format to out[] starting from out_start
+ */
+void user_payload_to_pdu(unsigned char in[],unsigned char out[],int out_start) {
+  int in_i = 0;
   int out_i = 0;
   byte space_left_in_oct = 8;
 
-  while(in[i]!='\0') {
+  while(in[in_i]!='\0') {
     //the current char is not NUL char
     if(space_left_in_oct==8) { //all the octet is free
-      out[out_i] = in[i];
-      i++;
+      out[out_i+out_start] = in[in_i];
+      in_i++;
       space_left_in_oct = 1;
     } else{
       //if the octet is not completely empty
       //append current char's 'space_left_in_oct' bits
       //to the out octet
-      out[out_i] &= 0b11111111>>space_left_in_oct;
-      out[out_i] |= in[i]<<(8-space_left_in_oct);
+      out[out_i+out_start] &= 0b11111111>>space_left_in_oct;
+      out[out_i+out_start] |= in[in_i]<<(8-space_left_in_oct);
       out_i++;
-      out[out_i] = in[i]>>space_left_in_oct;
+      out[out_i+out_start] = in[in_i]>>space_left_in_oct;
       space_left_in_oct++;
-      i++;
+      in_i++;
 
+    }
+  }
+  out[out_i+out_start+1]='\0';
+}
+
+/*
+ * Convert pdu content to ascii message
+ * given a string 'in', starting from pdu_start'th character
+ * upto pdu_len characters
+ */
+void pdu_to_user_payload(unsigned char in[],int pdu_start,int pdu_len,unsigned char out[]) {
+  int i = 0;
+  int out_i = 0;
+  int left_over_from_in=8;
+  while(i<pdu_len) {
+    if(left_over_from_in==8) {
+      out[out_i] = in[i+pdu_start];
+      out[out_i] &= 0b01111111;
+      out_i++;
+      left_over_from_in = 1;
+    } else {
+      out[out_i] = in[i+pdu_start]>>(8-left_over_from_in);
+      i++;
+      out[out_i] |= in[i+pdu_start]<<left_over_from_in;
+      out[out_i] &= 0b01111111;
+      left_over_from_in++;
+      out_i++;
     }
   }
   out[out_i+1]='\0';
