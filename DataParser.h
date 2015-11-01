@@ -4,7 +4,7 @@
 #define MAGIC_CHAR '$'
 
 #define MAX_PASSWORD_LEN 10
-#define MAX_PHONE_LEN 10
+#define MAX_PHONE_LEN 15
 /*
  * Workflow
  * --------
@@ -38,7 +38,7 @@
 #define REQ_CHANGE_PHONE 3
 /*
  * these are tokens that are to
- * be sent by user inorder to let 
+ * be sent by user inorder to let
  * the mcu indentify what type of request is this
  * it is translated to corresponding REQ_XXX codes
  * by the parser

@@ -3,7 +3,7 @@
 #include "GlobalOptions.h"
 #include "SMSMonitor.h"
 
-SoftwareSerial 
+//SoftwareSerial
 
 void setup() {
    // put your setup code here, to run once:

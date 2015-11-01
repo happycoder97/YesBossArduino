@@ -2,20 +2,20 @@
 #define _SerialGSM_H
 #include "Arduino.h"
 #include <SoftwareSerial.h>
+#include <string.h>
 
 #define SERIALTIMEOUT 2000
 #define MAXMSGLEN 160
+#define MAXPHONELEN 15
 #define BUFFERLEN 50
 
 class SerialGSM : public SoftwareSerial {
 public:
   struct SMS {
-    char* phone_no;
-    char* message;
-    byte max_message_len;
-    byte max_phone_no_len;
+    char phone_no[MAXPHONELEN];
+    char message[MAXMSGLEN];
   };
-    
+
   SerialGSM(int rxpin,int txpin);
   /* returns:
    * 0 if succeed
@@ -33,7 +33,8 @@ protected:
   void fwdSMS2Serial();
   char buffer[BUFFERLEN];
   int response;
-  int readline(char* buffer,int bufferlen);
+  int length_read;
+  int readline(char buffer[],int bufferlen,int& length_read);
 };
 
 #endif /* not defined _SerialGSM_H */

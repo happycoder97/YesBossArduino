@@ -48,7 +48,7 @@ class Auth {
          * returns false if the EEPROM
          * doesnot contain any valid data to restore
          */
-        void restoreFromEEPROM();
+        bool restoreFromEEPROM();
         /*
          * reset password to a default value
          */

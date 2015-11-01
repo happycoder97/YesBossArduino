@@ -1,5 +1,4 @@
 
-#include <Arduino.h>
 
 void trimSpaces(char* string);
 void strcpy(char* dest, int destbegin, const char* source,int sourcebegin, int length);

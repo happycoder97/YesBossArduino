@@ -1,7 +1,7 @@
-#include<Arduino.h>
+#include <Arduino.h>
 #include "Auth.h"
-#include<EEPROM.h>
-#include "Utils.h"
+#include "EEPROM.h"
+#include <string.h>
 void Auth::storeToEEPROM() {
     int addr = EEPROM_START_ADDR;
     EEPROM.put(addr,EEPROM_SIGNATURE);
@@ -14,7 +14,7 @@ bool Auth::restoreFromEEPROM() {
     byte addr = EEPROM_START_ADDR;
     byte signature;
     EEPROM.get(addr,signature);
-    fail if signature didn't match
+    // fail if signature didn't match
     if(signature!=EEPROM_SIGNATURE) return false;
     addr+=1;
     EEPROM.get(addr,password);
@@ -23,7 +23,7 @@ bool Auth::restoreFromEEPROM() {
 }
 
 void Auth::resetAuth() {
-    str_cpy(mobile,DEFAULT_PASSWORD);
+    strcpy(password,DEFAULT_PASSWORD);
 }
 
 bool Auth::tryAuthenticate(char* password) {
@@ -36,8 +36,8 @@ bool Auth::tryAuthenticate(char* password) {
 
 bool Auth::changePassword(char* old_password, char *new_password) {
     if(!tryAuthenticate(old_password)) return false;
-    str_cpy(password,new_password);
+    strcpy(password,new_password);
     return true;
 }
 
-}
+

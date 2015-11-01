@@ -31,6 +31,7 @@ it to a default value.
 
 Parser
 ------
+UPDATE: all \n are to be replaced by <space>
 
 Recieve General Format:
 
