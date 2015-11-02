@@ -56,7 +56,11 @@ void sendStatusReplyToPhone() {
 
 
 void loop() {
-  /* while(true) serial_gsm.debug_loop(); */
+  /* This function debug_loop was created
+     to pinpoint the problem. apparently, it didn't
+     work. although they share the same basic
+     print code*/
+     //while(true) serial_gsm.debug_loop();
   if(Serial.available()) {
     if(Serial.read()=='a') {
       sendStatusReplyToPhone();
