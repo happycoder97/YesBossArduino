@@ -90,6 +90,10 @@ int SerialGSM::readline(char buffer[],int bufferlen, int& length_read){
     Serial.print(nc);
     if(nc==0) Serial.println("OOPS!");
     else Serial.println("NOOPS!");
+
+    //The above code is the problem
+    //it prints OOPS, while debug_loop() doesnot
+    return -4;
     if(length_read>bufferlen) {
       #ifdef DEBUG
       Serial.print(":: readline (-1): BUFFER OVERFLOW read ");
@@ -232,6 +236,11 @@ void SerialGSM::println_d(const char s) {
 }
 
 void SerialGSM::debug_loop() {
-  if(Serial.available()) print(Serial.read());
-  if(available()) Serial.print(read());
+  char nc;
+  while(this->available()) {
+    nc=this->read();
+    Serial.print(nc);
+    if(nc==0) Serial.println("OOPS!");
+    else Serial.println("NOOPS!");
+  }
 }
