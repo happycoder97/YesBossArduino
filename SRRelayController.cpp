@@ -19,3 +19,7 @@ void SRRelayController::flush() {
     delay(10);
     digitalWrite(pin_sr_latch, LOW);
 }
+
+byte SRRelayController::getDeviceStatus() {
+  return device_status;
+}

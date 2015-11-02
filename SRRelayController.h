@@ -33,6 +33,10 @@ class SRRelayController {
          */
         void setDeviceStatus(byte device_status);
         /*
+         * get device status
+         */
+        byte getDeviceStatus();
+        /*
          * Since updating hardware takes time
          * hardware is not immediately updated on
          * calling turnDeviceOnOff function
@@ -40,6 +44,7 @@ class SRRelayController {
          * changes at once.
          */
         void flush();
+
     private:
         byte pin_sr_cp;
         byte pin_sr_ds;

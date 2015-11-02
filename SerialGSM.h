@@ -1,8 +1,11 @@
 #ifndef _SerialGSM_H
 #define _SerialGSM_H
-#include "Arduino.h"
+
+#include <Arduino.h>
 #include <SoftwareSerial.h>
-#include <string.h>
+#include "GlobalOptions.h"
+#include "Utils.h"
+
 
 #define SERIALTIMEOUT 2000
 #define MAXMSGLEN 160
@@ -27,6 +30,7 @@ public:
   void reset();
   int receiveSMS(SMS& sms);
   void boot();
+  void debug_loop();
 
 protected:
   unsigned long lastrec;
@@ -35,7 +39,13 @@ protected:
   int response;
   int length_read;
   int readline(char buffer[],int bufferlen,int& length_read);
+  void print_d(const char *s);
+  void println_d(const char *s);
+  void print_d(const char s);
+  void println_d(const char s);
+  bool debug_show_prompt = true;
 };
 
 #endif /* not defined _SerialGSM_H */
+
 

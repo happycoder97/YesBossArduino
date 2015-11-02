@@ -2,7 +2,7 @@
 
 void strcpy(char* dest, int destbegin,  const char* source,int sourcebegin, int length) {
     int i=0;
-    while(source[i+sourcebegin]!='\0'&&(length!=-1||i<length)) {
+    while(source[i+sourcebegin]!='\0'&&(length==-1||i<length)) {
         if(length!=-1&&i>=length) return;
         dest[i+destbegin] = source[i+sourcebegin];
         i++;
@@ -10,7 +10,7 @@ void strcpy(char* dest, int destbegin,  const char* source,int sourcebegin, int 
     dest[i+destbegin]='\0';
 }
 
-void trimSpaces(char* string) {
+void trimSpaces(char string[]) {
     if(string[0]==' ') {
         byte i = 0;
         while(string[i]!='\0') {
@@ -105,3 +105,27 @@ int strlen(char* s) {
   while(s[len]!='\0') len++;
   return len;
 }
+/*
+ * find the index of first occurrence of needle
+ * in hay, starting from i
+ */
+int str_indexof(char hay[], char needle[],int i) {
+  bool found = false;
+  while(hay[i]!='\0') {
+    if(hay[i]==needle[0]) {
+      int j=0;
+      found =true;
+      while(needle[j]!='\0') {
+       if(needle[j]!=hay[i+j]) {
+         found=false; break;
+       }
+       j++;
+      }
+      if(found) return i;
+    }
+    i++;
+  }
+  return -1;
+}
+
+

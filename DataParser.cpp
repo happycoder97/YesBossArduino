@@ -100,7 +100,7 @@ startenc:
         0,buffer,0,-1);
     return;
   }
-      
+
   request_message.message_type=REQ_INVALID;
   #ifdef DEBUG
   Serial.print("WARN: invalid token found :");

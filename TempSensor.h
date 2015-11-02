@@ -1,4 +1,5 @@
 #include<Arduino.h>
+#include "GlobalOptions.h"
 #include "DHT11.h"
 
 class TempSensor {

@@ -1,4 +1,5 @@
 #include<Arduino.h>
+#include "GlobalOptions.h"
 
 #define WATER_LEVEL_VERY_LOW 20
 #define WATER_LEVEL_LOW 30

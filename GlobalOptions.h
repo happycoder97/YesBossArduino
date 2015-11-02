@@ -1,3 +1,5 @@
+#define DEBUG
+
 #define GSM_RX 2
 #define GSM_TX 3
 #define LED_INDICATOR 4

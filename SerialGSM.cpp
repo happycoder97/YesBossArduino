@@ -5,38 +5,20 @@
 
 // error codes
 // http://www.developershome.com/sms/resultCodes2.asp
+#include <SoftwareSerial.h>
 #include "SerialGSM.h"
+#include "Utils.h"
 
-SerialGSM::SerialGSM(int rxpin,int txpin):
-SoftwareSerial(rxpin,txpin) { }
+SerialGSM::SerialGSM(int rxpin,int txpin): SoftwareSerial(rxpin,txpin) { 
+}
 
 void SerialGSM::fwdSMS2Serial(){
-  #ifdef DEBUG
-  Serial.println("AT+CMGF=1"); // set SMS mode to text
-  #endif
-  this->println("AT+CMGF=1"); // set SMS mode to text
+  println_d("AT+CMGF=1"); // set SMS mode to text
   delay(200);
-  response = this->readline(buffer,BUFFERLEN,length_read);
-  #ifdef DEBUG
-  Serial.print("Read length:");
-  Serial.println(length_read);
-  Serial.print("Response:");
-  Serial.println(response);
-  Serial.print(buffer);
-  Serial.println("<EOR>");
-  Serial.println("AT+CNMI=2,2,0,0,0"); // set module to send SMS data to serial out upon receipt
-  #endif
-  this->println("AT+CNMI=2,2,0,0,0"); // set module to send SMS data to serial out upon receipt
+  response = readline(buffer,BUFFERLEN,length_read);
+  println_d("AT+CNMI=2,2,0,0,0"); // set module to send SMS data to serial out upon receipt
   delay(200);
-  response=this->readline(buffer,BUFFERLEN,length_read);
-  #ifdef DEBUG
-  Serial.print("Read length:");
-  Serial.println(length_read);
-  Serial.print("Response:");
-  Serial.println(response);
-  Serial.println(buffer);
-  Serial.println("<EOR>");
-  #endif
+  response=readline(buffer,BUFFERLEN,length_read);
 }
   /* returns:
    * 0 if succeed
@@ -46,102 +28,48 @@ void SerialGSM::fwdSMS2Serial(){
    */
 byte SerialGSM::sendSMS(SMS& sms) {
   #ifdef DEBUG
-  Serial.print("Sending SMS to :");
+  Serial.print(":: Sending SMS to :");
   Serial.println(sms.phone_no);
   Serial.print(sms.message);
   Serial.println("<EOF>");
-  Serial.println("AT+CMGF=1"); // set SMS mode to text
   #endif
 
-  this->println("AT+CMGF=1"); // set SMS mode to text
-  delay(200);
-  response = this->readline(buffer,BUFFERLEN,length_read);
-  #ifdef DEBUG
-  Serial.print("Read length:");
-  Serial.println(length_read);
-  Serial.print("Response:");
-  Serial.println(response);
-  Serial.println(buffer);
-  Serial.println("<EOR>");
-
-  Serial.print("AT+CMGS=");
-  Serial.print(char(34)); // ASCII equivalent of "
-  Serial.print(sms.phone_no);
-  Serial.println(char(34)); // ASCII equivalent of "
-  #endif
-
+  println_d("AT+CMGF=1"); // set SMS mode to text
+  delay(100);
+  response = readline(buffer,BUFFERLEN,length_read);
+  if(!isListening()) Serial.println(":: not listening!");
   if(response<0) return 2;
 
-  this->print("AT+CMGS=");
-  this->print(char(34)); // ASCII equivalent of "
-  this->print(sms.phone_no);
-  this->println(char(34));  // ASCII equivalent of "
+  print_d("AT+CMGS=\"");
+  print_d(sms.phone_no);
+  println_d('"');  // ASCII equivalent of "
   delay(500); // give the module some thinking time
 
-  response = this->readline(buffer,BUFFERLEN,length_read);
-
-  #ifdef DEBUG
-  Serial.print("Read length:");
-  Serial.println(length_read);
-  Serial.print("Response:");
-  Serial.println(response);
-  Serial.println(buffer);
-  Serial.println("<EOR>");
-  Serial.print(sms.message);
-  Serial.println("<EOF>")
-  #endif
-
+  response = readline(buffer,BUFFERLEN,length_read);
   if(response<0) return 2;
 
-  this->print(sms.message);
-  this->print(char(26));  // ASCII equivalent of Ctrl-Z
+  println_d(sms.message);
+  print_d(char(26));  // ASCII equivalent of Ctrl-Z
   delay(500);
 
-  response = this->readline(buffer,BUFFERLEN,length_read);
-  #ifdef DEBUG
-  Serial.print("Read length:");
-  Serial.println(length_read);
-  Serial.print("Response:");
-  Serial.println(response);
-  Serial.println(buffer);
-  Serial.println("<EOR>");
-  #endif
+  response = readline(buffer,BUFFERLEN,length_read);
   if(response<0) return 2;
+  #ifdef DEBUG
+  Serial.println(":: Message sending succeded.");
+  #endif
   return 0;
 }
 
 
 void SerialGSM::deleteAllSMS(){
-  #ifdef DEBUG
-  Serial.println("AT+CMGD=1,4"); // delete all SMS
-  #endif
-  this->println("AT+CMGD=1,4"); // delete all SMS
-  response = this->readline(buffer,BUFFERLEN,length_read);
-  #ifdef DEBUG
-  Serial.print("Read length:");
-  Serial.println(length_read);
-  Serial.print("Response:");
-  Serial.println(response);
-  Serial.println(buffer);
-  Serial.println("<EOR>");
-  #endif
+  println_d("AT+CMGD=1,4"); // delete all SMS
+  response = readline(buffer,BUFFERLEN,length_read);
 }
 
 void SerialGSM::reset(){
-  #ifdef DEBUG
-  Serial.println("AT+CFUN=1,1"); // Reset Modem
-  #endif
-  this->println("AT+CFUN=1,1"); // Reset Modem
+  println_d("AT+CFUN=1,1"); // Reset Modem
   delay(200);
-  response = this->readline(buffer,BUFFERLEN,length_read);
-  #ifdef DEBUG
-  Serial.print("Read length:");
-  Serial.println(length_read);
-  Serial.print("Response:");
-  Serial.println(response);
-  Serial.println(buffer);
-  Serial.println("<EOR>");
-  #endif
+  response = readline(buffer,BUFFERLEN,length_read);
 }
 
 /*
@@ -155,67 +83,102 @@ int SerialGSM::readline(char buffer[],int bufferlen, int& length_read){
   char nc;
   while (this->available()){
     nc=this->read();
-    if(length_read>bufferlen) { return -1; }
+    /* The below lines are added to investigate why
+     * length_read was reported to be > 0
+     * but Serial.print(buffer) was empty
+     */
+    Serial.print(nc);
+    if(nc==0) Serial.println("OOPS!");
+    else Serial.println("NOOPS!");
+    if(length_read>bufferlen) {
+      #ifdef DEBUG
+      Serial.print(":: readline (-1): BUFFER OVERFLOW read ");
+      Serial.print(length_read);
+      Serial.print(" chars");
+      Serial.print(":<- ");
+      Serial.print(buffer);
+      Serial.println("<EOR>");
+      #endif
+      return -1;
+    }
     if(nc=='\r') continue; //skip CR
     if(nc=='\n') {
       lastrec = millis();
       buffer[length_read]='\0';
-      return length_read;
+      #ifdef DEBUG
+      Serial.print("- readline (0): read ");
+      Serial.print(length_read);
+      Serial.print(" chars");
+      Serial.print(":<- ");
+      Serial.print(buffer);
+      Serial.println("<EOR>");
+      #endif
+      return 0;
     }
     if((millis()> lastrec + SERIALTIMEOUT) && (length_read > 0)) {
+      #ifdef DEBUG
+      Serial.print("- readline (-2): TIMEDOUT read ");
+      Serial.print(length_read);
+      Serial.print(" chars");
+      Serial.print(":<- ");
+      Serial.print(buffer);
+      Serial.println("<EOR>");
+      #endif
       return -2;
     }
+    
     buffer[length_read]=nc;
     lastrec=millis();
     length_read++;
   }
+  #ifdef DEBUG
+  Serial.print("- readline (-3): Serial.available() = false; read ");
+  Serial.print(length_read);
+  Serial.print(" chars");
+  Serial.print(":<- ");
+  Serial.print(buffer);
+  Serial.println("<EOR>");
+  #endif
   return -3;
 }
 
 /*
  * returns:
- * >
- * 3 if empty message
- * (-1,-2,-3)+3 errors caused by readline
- * 4 sms buffer overflow
- * 5 phone no buffer overflow
+ * -1 no message
+ * -2 sms buffer overflow
  */
 int SerialGSM::receiveSMS(SMS& sms) {
-  // response = readline(buffer,BUFFERLEN,length_read);
-  // #ifdef DEBUG
-  // Serial.println("Trying to read sms from serial..");
-  // Serial.print("Read length:");
-  // Serial.println(length_read);
-  // Serial.print("Response:");
-  // Serial.println(response);
-  // Serial.println(buffer);
-  // Serial.println("<EOR>");
-  // #endif
-  // if(response<=0) return response;
-  // if (this->readline(buffer,BUFFERLEN,length_read)>5){
-  // // Get the number of the sms sender in order to be able to reply
-	// if ( strstr(response, "CMT: ") != NULL ){
-	//     int sf=6;
-	//     if(strstr(response, "+CMT:")) sf++;
-	// 	    for (int i=0;i < PHONESIZE;i++){
-	// 	      sendernumber[i]=inmessage[sf+i];
-	// 	    }
-// 		sendernumber[PHONESIZE]='\0';
-// 		return 0;
-// 	 }else{
-// 		if(insms) {
-// 			insms=0;
-// 			return 1;
-// 		}
-// 	}
-//   }
+  response = readline(buffer,BUFFERLEN,length_read);
+  if(response<0) return -1;
+
+  if (readline(buffer,BUFFERLEN,length_read)<7) return -1;
+  //if CMT: is not in the line, it is not a message
+	if (str_indexof(buffer, "CMT: ",0) ==-1 ) return -1;
+
+  byte ph_start=str_indexof(buffer,"\"",0);
+  byte ph_end = str_indexof(buffer,"\"",ph_start+1);
+  // "PH_NO" | ph_start = 0 | ph_end = 6
+  // length should be 5 | it is (ph_end - ph_start) - 1
+  strcpy(sms.phone_no,0,buffer,ph_start+1,(ph_end-ph_start)-1);
+  int sms_i=0;
+  do {
+    response = readline(buffer,BUFFERLEN,length_read);
+    if(sms_i+length_read>MAXMSGLEN) {
+      #ifdef DEBUG
+      Serial.println(":: ERROR recieveSMS sms buffer overflow.");
+      #endif
+      return -2;
+    }
+    strcpy(sms.message,sms_i,buffer,0,length_read);
+    sms_i+=length_read;
+  } while(response>=0);
   return 0;
 }
 
 
 void SerialGSM::boot(){
   #ifdef DEBUG
-  Serial.print("Waiting for modem to turn on.");
+  Serial.print(":: Waiting for modem to turn on.");
   #endif
   int counter=0;
   while(counter++ < 15){
@@ -226,8 +189,49 @@ void SerialGSM::boot(){
   }
   #ifdef DEBUG
   Serial.println();
-  Serial.println("Now forwarding SMS to Serial");
+  Serial.println(":: Now forwarding SMS to Serial");
   #endif
   fwdSMS2Serial();
 }
+// ------------- DEBUG LOGGING WRAPPERS ------------
+// The following functions wrap around print and println functions
+// to show DEBUG LOG if DEBUG is defined
+void SerialGSM::print_d(const char* s) {
+ #ifdef DEBUG
+ if(debug_show_prompt) Serial.print(":-> ");
+ Serial.print(s);
+ debug_show_prompt= false;
+ #endif
+ print(s);
+}
 
+void SerialGSM::println_d(const char* s) {
+ #ifdef DEBUG
+ if(debug_show_prompt) Serial.print(":-> ");
+ Serial.println(s);
+ debug_show_prompt= true;
+ #endif
+ println(s);
+}
+void SerialGSM::print_d(const char s) {
+ #ifdef DEBUG
+ if(debug_show_prompt) Serial.print(":-> ");
+ Serial.print(s);
+ debug_show_prompt= false;
+ #endif
+ print(s);
+}
+
+void SerialGSM::println_d(const char s) {
+ #ifdef DEBUG
+ if(debug_show_prompt) Serial.print(":-> ");
+ Serial.println(s);
+ debug_show_prompt= true;
+ #endif
+ println(s);
+}
+
+void SerialGSM::debug_loop() {
+  if(Serial.available()) print(Serial.read());
+  if(available()) Serial.print(read());
+}

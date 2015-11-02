@@ -1,5 +1,6 @@
 #pragma once
 #include<Arduino.h>
+#include "GlobalOptions.h"
 
 /*
  * Set according to your applications need
@@ -10,7 +11,8 @@
  * This value verifies that it
  * is valid data starting at EEPROM_START_ADDR
  * Randomly change this value when
- * PASSWORD_LEN is updated
+ * any if password/phone length or default values
+ * are changed
  * MUST BE less than 256 (ie one byte)
  */
  #define EEPROM_SIGNATURE 1
@@ -18,9 +20,10 @@
  * change these values to suite your needs
  */
  #define PASSWORD_LEN 11
+ #define PHONE_LEN 11
 
  #define DEFAULT_PASSWORD "KPCHSS"
-
+ #define DEFAULT_PHONE "9496143078"
 /*
  * This class stores the password
  * of user and provides methods
@@ -64,6 +67,9 @@ class Auth {
          * else return false
          */
         bool changePassword(char old_password[PASSWORD_LEN],char new_password[PASSWORD_LEN]);
+        char* getPhone();
+        void setPhone(char phone[]);
     private:
+        char phone[PHONE_LEN];
         char password[PASSWORD_LEN];
 };

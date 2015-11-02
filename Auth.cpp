@@ -1,13 +1,14 @@
 #include <Arduino.h>
+#include <EEPROM.h>
 #include "Auth.h"
-#include "EEPROM.h"
-#include <string.h>
+#include "Utils.h"
 void Auth::storeToEEPROM() {
     int addr = EEPROM_START_ADDR;
     EEPROM.put(addr,EEPROM_SIGNATURE);
     addr += 1; //advance one byte
     EEPROM.put(addr,password);
-    // addr+=PASSWORD_LEN;
+    addr+=sizeof(password);
+    EEPROM.put(addr,phone);
 }
 
 bool Auth::restoreFromEEPROM() {
@@ -18,12 +19,14 @@ bool Auth::restoreFromEEPROM() {
     if(signature!=EEPROM_SIGNATURE) return false;
     addr+=1;
     EEPROM.get(addr,password);
-    // addr+=PASSWORD_LEN;
+    addr+=sizeof(password);
+    EEPROM.get(addr,phone);
     return true;
 }
 
 void Auth::resetAuth() {
     strcpy(password,DEFAULT_PASSWORD);
+    strcpy(phone,DEFAULT_PHONE);
 }
 
 bool Auth::tryAuthenticate(char* password) {
@@ -40,4 +43,10 @@ bool Auth::changePassword(char* old_password, char *new_password) {
     return true;
 }
 
+char* Auth::getPhone() {
+  return phone;
+}
 
+void Auth::setPhone(char* phone) {
+  strcpy(this->phone,phone);
+}
