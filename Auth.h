@@ -23,7 +23,7 @@
  #define PHONE_LEN 11
 
  #define DEFAULT_PASSWORD "KPCHSS"
- #define DEFAULT_PHONE "9496143078"
+ #define DEFAULT_PHONE "9567665206"
 /*
  * This class stores the password
  * of user and provides methods

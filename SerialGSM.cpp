@@ -37,7 +37,7 @@ byte SerialGSM::sendSMS(SMS& sms) {
   println_d("AT+CMGF=1"); // set SMS mode to text
   delay(100);
   response = readline(buffer,BUFFERLEN,length_read);
-  if(!isListening()) Serial.println(":: not listening!");
+  //if(!isListening()) Serial.println(":: not listening!");
   if(response<0) return 2;
 
   print_d("AT+CMGS=\"");

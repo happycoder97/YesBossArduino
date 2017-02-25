@@ -61,6 +61,7 @@ void loop() {
         sms_monitor.getSMS(sms.message);
         DataParser::Request_Message request_message;
         dataParser.parseRequest(sms.message,request_message);
+        
         switch(request_message.message_type) {
             case REQ_INVALID:
                 break;
@@ -68,14 +69,16 @@ void loop() {
                 sendStatusReplyToPhone();
                 break;
             case REQ_UPDATE_STATUS:
+            {
                 byte cur_stat = relay_controller.getDeviceStatus();
                 byte mask = request_message.status_update_request.device_on_off_mask;
                 byte new_stat = request_message.status_update_request.device_on_off;
-                cur_stat = (cur_stat & ~mask) | (newvalue & mask);
+                cur_stat = (cur_stat & ~mask) | (new_stat & mask);
                 relay_controller.setDeviceStatus(cur_stat);
                 relay_controller.flush();
                 sendStatusReplyToPhone();
                 break;
+            }
             case REQ_CHANGE_PHONE:
                 auth.setPhone(request_message.change_phone_request.new_phone);
                 sendStatusReplyToPhone();

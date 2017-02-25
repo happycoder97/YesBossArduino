@@ -20,7 +20,7 @@ class SMSMonitor {
          * rx_pin -> SIM900A TTL rx_pin
          * tx_pin -> SIM900A TTL tx_pin
          */
-        SMSMonitor(byte rx_pin,byte tx_pin);
+        SMSMonitor(SerialGSM &serial_gsm_ref);
 
     private:
         
