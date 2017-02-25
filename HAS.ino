@@ -13,6 +13,7 @@
 #include "MemoryFree.h"
 
 SerialGSM serial_gsm(GSM_RX,GSM_TX);
+SMSMonitor sms_monitor(serial_gsm);
 SRRelayController relay_controller(RELAY_SR_CP,RELAY_SR_DS,RELAY_SR_LATCH);
 WaterLevel water_level(WATER_LEVEL_1,WATER_LEVEL_2,WATER_LEVEL_3,WATER_LEVEL_0);
 TempSensor temp_sensor(TEMP_SENSOR_DATA);
@@ -47,7 +48,6 @@ void sendStatusReplyToPhone() {
   status.device_on_off=relay_controller.getDeviceStatus();
   status.temperature=temp_sensor.getTemp();
   status.waterlevel_percent=water_level.getWaterLevel();
-
   dataParser.parseStatusReply(sms.message,status);
   strcpy(sms.phone_no,auth.getPhone());
   serial_gsm.sendSMS(sms);
@@ -56,16 +56,34 @@ void sendStatusReplyToPhone() {
 
 
 void loop() {
-  /* This function debug_loop was created
-     to pinpoint the problem. apparently, it didn't
-     work. although they share the same basic
-     print code*/
-    /* while(true) serial_gsm.debug_loop(); */
-  if(Serial.available()) {
-    if(Serial.read()=='a') {
-      sendStatusReplyToPhone();
-      Serial.println(freeMemory());
+    delay(1000);
+    if (sms_monitor.hasSMS()) {
+        sms_monitor.getSMS(sms.message);
+        DataParser::Request_Message request_message;
+        dataParser.parseRequest(sms.message,request_message);
+        switch(request_message.message_type) {
+            case REQ_INVALID:
+                break;
+            case REQ_STATUS:
+                sendStatusReplyToPhone();
+                break;
+            case REQ_UPDATE_STATUS:
+                byte cur_stat = relay_controller.getDeviceStatus();
+                byte mask = request_message.status_update_request.device_on_off_mask;
+                byte new_stat = request_message.status_update_request.device_on_off;
+                cur_stat = (cur_stat & ~mask) | (newvalue & mask);
+                relay_controller.setDeviceStatus(cur_stat);
+                relay_controller.flush();
+                sendStatusReplyToPhone();
+                break;
+            case REQ_CHANGE_PHONE:
+                auth.setPhone(request_message.change_phone_request.new_phone);
+                sendStatusReplyToPhone();
+                break;
+            default:
+                break;
+                
+        }
     }
-  }
 }
 

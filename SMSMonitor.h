@@ -10,10 +10,12 @@ class SMSMonitor {
         bool hasSMS();
         /*
          * Get next sms
+         * if hasSMS succeed.
+         * Otherwise will blank the given array or previous sms is returned
          */
-        bool nextSMS(char msg[160]);
+        void getSMS(char msg[160]);
         /*
-         * Creates an instanc of SMSMonitor
+         * Creates an instance of SMSMonitor
          * and instantiate the SerialGSM interface
          * rx_pin -> SIM900A TTL rx_pin
          * tx_pin -> SIM900A TTL tx_pin
