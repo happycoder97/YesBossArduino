@@ -109,7 +109,7 @@ int strlen(char* s) {
  * find the index of first occurrence of needle
  * in hay, starting from i
  */
-int str_indexof(char hay[], char needle[],int i) {
+int str_indexof(char hay[], const char needle[],int i) {
   bool found = false;
   while(hay[i]!='\0') {
     if(hay[i]==needle[0]) {
